@@ -1,0 +1,16 @@
+@host=localhost
+@port=3002
+@url=http://{{host}}:{{port}}
+
+# process payment
+POST {{url}}/payments
+Content-Type: application/json
+
+{
+    "correlationId": "{{$guid}}",
+    "amount": 19.90
+}
+
+### get payments summary
+
+GET {{url}}/payments-summary?from={{$datetime iso8601 -1 d}}&to={{$datetime iso8601}}
