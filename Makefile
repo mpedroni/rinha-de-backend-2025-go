@@ -1,5 +1,5 @@
 run:
-	SERVICE_NAME=api-local DEBUG=true ADDR=:3002 go run cmd/api/api.go
+	SERVICE_NAME=api-local DEBUG=true ADDR=:3002 WORKERS_COUNT=4 go run cmd/api/api.go
 
 up:
 	docker compose -f ./infra/payment-processors/docker-compose.yaml up -d 

@@ -5,13 +5,16 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strconv"
 )
 
 type Config struct {
-	Addr        string
-	Debug       bool
-	ServiceName string
-	Stdout      io.Writer
+	Addr         string
+	Debug        bool
+	ServiceName  string
+	WorkersCount int
+
+	Stdout io.Writer
 }
 
 var Cfg *Config
@@ -21,6 +24,7 @@ func Load() error {
 	addr := os.Getenv("ADDR")
 	debug := os.Getenv("DEBUG")
 	service := os.Getenv("SERVICE_NAME")
+	workersCount := os.Getenv("WORKERS_COUNT")
 
 	if addr == "" {
 		addr = ":3000"
@@ -30,6 +34,15 @@ func Load() error {
 		return errors.New("SERVICE_NAME environment variable is required")
 	}
 
+	if workersCount == "" {
+		return errors.New("WORKERS_COUNT environment variable is required")
+	}
+
+	workersCountInt, err := strconv.Atoi(workersCount)
+	if err != nil {
+		return errors.New("WORKERS_COUNT must be an integer")
+	}
+
 	isDebug := debug == "true"
 	out := io.Discard
 	if isDebug {
@@ -37,10 +50,11 @@ func Load() error {
 	}
 
 	Cfg = &Config{
-		Addr:        addr,
-		Debug:       isDebug,
-		ServiceName: service,
-		Stdout:      out,
+		Addr:         addr,
+		Debug:        isDebug,
+		ServiceName:  service,
+		WorkersCount: workersCountInt,
+		Stdout:       out,
 	}
 
 	setupLogger()

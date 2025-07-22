@@ -16,9 +16,19 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /payments", payment.ProcessPaymentHandler)
+	queue := payment.NewQueue()
+	svc := payment.NewService(queue)
+	h := payment.NewHandler(svc)
 
-	mux.HandleFunc("GET /payments-summary", payment.GetPaymentsSummaryHandler)
+	wp := &payment.WorkerPool{
+		Num:     config.Cfg.WorkersCount,
+		Queue:   queue,
+		Service: svc,
+	}
+	wp.Run()
+
+	mux.HandleFunc("POST /payments", h.ProcessPaymentHandler)
+	mux.HandleFunc("GET /payments-summary", h.GetPaymentsSummaryHandler)
 
 	config.Log.Info("starting server", "addr", config.Cfg.Addr)
 	if err := http.ListenAndServe(config.Cfg.Addr, mux); err != nil {

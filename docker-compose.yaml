@@ -44,6 +44,7 @@ services:
       - DEBUG=true
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
+      - WORKERS_COUNT=4
     networks:
       - api-network
       - payment-processor
@@ -64,6 +65,7 @@ services:
       - DEBUG=true
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
+      - WORKERS_COUNT=4
 
 networks:
   api-network:
