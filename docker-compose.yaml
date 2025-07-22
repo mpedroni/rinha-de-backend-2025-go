@@ -12,6 +12,11 @@ services:
     networks:
       - api-network
       - payment-processor
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "38MB"
 
   db:
     image: postgres:17-alpine
@@ -24,6 +29,11 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - api-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "120MB"
 
   api1: &api
     image: mpedroni/rinha-backend-2025:latest
@@ -39,6 +49,11 @@ services:
       - payment-processor
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "96MB"
 
   api2:
     <<: *api
@@ -49,8 +64,6 @@ services:
       - DEBUG=true
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
-    depends_on:
-      - db
 
 networks:
   api-network:
