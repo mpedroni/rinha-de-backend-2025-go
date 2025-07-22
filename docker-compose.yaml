@@ -12,6 +12,19 @@ services:
     networks:
       - api-network
       - payment-processor
+
+  db:
+    image: postgres:17-alpine
+    hostname: rinha-db
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=rinha
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - api-network
+
   api1: &api
     image: mpedroni/rinha-backend-2025:latest
     hostname: api1
@@ -24,6 +37,8 @@ services:
     networks:
       - api-network
       - payment-processor
+    depends_on:
+      - db
 
   api2:
     <<: *api
@@ -34,9 +49,8 @@ services:
       - DEBUG=true
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
-    networks:
-      - api-network
-      - payment-processor
+    depends_on:
+      - db
 
 networks:
   api-network:
