@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -48,6 +49,53 @@ func (s *Service) SchedulePayment(ctx context.Context, req ProcessPaymentRequest
 		Processor:     Default,
 	})
 	return nil
+}
+
+func (s *Service) GetPaymentsSummary(ctx context.Context, req GetPaymentsSummaryRequest) (PaymentsSummaryResponse, error) {
+	var summary PaymentsSummaryResponse
+	rows, err := s.db.Query(ctx, `
+		SELECT
+			processor, ROUND(SUM(amount::decimal / 100), 2), COUNT(*)
+		FROM payments
+		WHERE
+			received_at BETWEEN $1 AND $2
+			AND status = 1
+		GROUP BY processor;
+	`, req.From, req.To)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return PaymentsSummaryResponse{}, nil
+		}
+		return PaymentsSummaryResponse{}, fmt.Errorf("failed to get payments summary: %v", err)
+	}
+
+	for rows.Next() {
+		var processor int
+		var totalAmount float64
+		var totalRequests int
+
+		if err := rows.Scan(&processor, &totalAmount, &totalRequests); err != nil {
+			return PaymentsSummaryResponse{}, fmt.Errorf("failed to scan row: %v", err)
+		}
+
+		switch processor {
+		case 0:
+			summary.Default = PaymentsSummary{
+				TotalRequests: totalRequests,
+				TotalAmount:   totalAmount,
+			}
+		case 1:
+			summary.Fallback = PaymentsSummary{
+				TotalRequests: totalRequests,
+				TotalAmount:   totalAmount,
+			}
+		default:
+			return PaymentsSummaryResponse{}, fmt.Errorf("unknown processor: %d", processor)
+		}
+	}
+
+	return summary, nil
 }
 
 func (s *Service) Pay(ctx context.Context, p *Payment) error {

@@ -4,8 +4,8 @@ run:
 	export ADDR=:3002 && \
 	export WORKERS_COUNT=4 && \
 	export DB_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/rinha?sslmode=disable && \
-	export DEFAULT_PROCESSOR_URL=http://localhost:8001 && \
-	export FALLBACK_PROCESSOR_URL=http://localhost:8002 && \
+	export PROCESSOR_DEFAULT_URL=http://localhost:8001 && \
+	export PROCESSOR_FALLBACK_URL=http://localhost:8002 && \
 	go run cmd/api/api.go
 
 up:

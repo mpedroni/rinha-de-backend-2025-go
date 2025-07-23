@@ -31,6 +31,12 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - api-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         limits:
@@ -44,7 +50,7 @@ services:
       - SERVICE_NAME=api-1
       - PORT=3000
       - DEBUG=true
-      - DB_CONNECTION_STRING=postgres://postgres:postgres@db:5432/rinha?sslmode=disable
+      - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
       - WORKERS_COUNT=4
@@ -52,7 +58,8 @@ services:
       - api-network
       - payment-processor
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -66,7 +73,7 @@ services:
       - SERVICE_NAME=api-2
       - PORT=3000
       - DEBUG=true
-      - DB_CONNECTION_STRING=postgres://postgres:postgres@db:5432/rinha?sslmode=disable
+      - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
       - WORKERS_COUNT=4

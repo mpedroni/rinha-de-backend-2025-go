@@ -44,6 +44,27 @@ func (h *Handler) GetPaymentsSummaryHandler(w http.ResponseWriter, r *http.Reque
 
 	config.Log.Debug("getting payments summary", "request", fmt.Sprintf("%+v", req))
 
+	summary, err := h.svc.GetPaymentsSummary(r.Context(), req)
+	if err != nil {
+		config.Log.Error("failed to get payments summary", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	body, err := json.Marshal(summary)
+	if err != nil {
+		config.Log.Error("failed to marshal payments summary", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`payments summary`))
+
+	if _, err := w.Write(body); err != nil {
+		config.Log.Error("failed to write payments summary", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

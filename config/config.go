@@ -30,8 +30,8 @@ func Load() error {
 	service := os.Getenv("SERVICE_NAME")
 	workersCount := os.Getenv("WORKERS_COUNT")
 	dbConnectionString := os.Getenv("DB_CONNECTION_STRING")
-	defaultProcessorURL := os.Getenv("DEFAULT_PROCESSOR_URL")
-	fallbackProcessorURL := os.Getenv("FALLBACK_PROCESSOR_URL")
+	defaultProcessorURL := os.Getenv("PROCESSOR_DEFAULT_URL")
+	fallbackProcessorURL := os.Getenv("PROCESSOR_FALLBACK_URL")
 
 	if addr == "" {
 		addr = ":3000"
@@ -55,11 +55,11 @@ func Load() error {
 	}
 
 	if defaultProcessorURL == "" {
-		return errors.New("DEFAULT_PROCESSOR_URL environment variable is required")
+		return errors.New("PROCESSOR_DEFAULT_URL environment variable is required")
 	}
 
 	if fallbackProcessorURL == "" {
-		return errors.New("FALLBACK_PROCESSOR_URL environment variable is required")
+		return errors.New("PROCESSOR_FALLBACK_URL environment variable is required")
 	}
 
 	isDebug := debug == "true"

@@ -28,6 +28,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to database: %w", err))
 	}
+	defer db.Close()
 
 	if err := db.Ping(context.Background()); err != nil {
 		panic(fmt.Errorf("failed to ping database: %w", err))
