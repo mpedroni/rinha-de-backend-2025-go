@@ -42,7 +42,7 @@ func (pq *Queue) publish() {
 	}
 }
 
-func (pq *Queue) Enqueue(req ProcessPaymentRequest) {
+func (pq *Queue) Publish(req ProcessPaymentRequest) {
 	pq.m.Lock()
 	defer pq.m.Unlock()
 	pq.payments = append(pq.payments, req)

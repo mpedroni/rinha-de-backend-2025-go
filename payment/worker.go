@@ -18,7 +18,7 @@ func (wp *WorkerPool) Run() {
 
 				if err != nil {
 					config.Log.Error("payment processing failed", "workerID", workerID, "correlationId", req.CorrelationID, "error", err)
-					wp.Queue.Enqueue(req)
+					wp.Queue.Publish(req)
 					continue
 				}
 
