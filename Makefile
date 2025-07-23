@@ -1,5 +1,12 @@
 run:
-	SERVICE_NAME=api-local DEBUG=true ADDR=:3002 WORKERS_COUNT=4 go run cmd/api/api.go
+	export SERVICE_NAME=api-1 && \
+	export DEBUG=true && \
+	export ADDR=:3002 && \
+	export WORKERS_COUNT=4 && \
+	export DB_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/rinha?sslmode=disable && \
+	export DEFAULT_PROCESSOR_URL=http://localhost:8001 && \
+	export FALLBACK_PROCESSOR_URL=http://localhost:8002 && \
+	go run cmd/api/api.go
 
 up:
 	docker compose -f ./infra/payment-processors/docker-compose.yaml up -d 

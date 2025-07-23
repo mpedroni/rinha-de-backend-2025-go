@@ -1,6 +1,9 @@
 package payment
 
-import "time"
+import (
+	"math"
+	"time"
+)
 
 type PaymentStatus int
 
@@ -24,4 +27,17 @@ type Payment struct {
 	Processor     PaymentProcessor
 	ReceivedAt    time.Time
 	PaidAt        time.Time
+}
+
+func ParseMoney(amount float64) int {
+	return int(math.Round(amount * 100))
+}
+
+func (p *Payment) AmountAsFloat() float64 {
+	return float64(p.Amount / 100.0)
+}
+
+func (p *Payment) Paid() {
+	p.Status = Paid
+	p.PaidAt = time.Now()
 }

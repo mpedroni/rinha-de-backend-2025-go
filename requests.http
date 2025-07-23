@@ -14,3 +14,26 @@ Content-Type: application/json
 ### get payments summary
 
 GET {{url}}/payments-summary?from={{$datetime iso8601 -1 d}}&to={{$datetime iso8601}}
+
+
+################# payment processor #################
+### process payment
+POST http://localhost:8001/payments
+Content-Type: application/json
+
+{
+    "correlationId": "{{$guid}}",
+    "amount": 19.90,
+    "receivedAt": "{{$datetime iso8601}}"
+}
+
+### purge payments
+POST http://localhost:8001/admin/purge-payments
+Content-Type: application/json
+X-Rinha-Token: 123
+
+{
+    "correlationId": "{{$guid}}",
+    "amount": 19.90,
+    "receivedAt": "{{$datetime iso8601}}"
+}

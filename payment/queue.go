@@ -2,9 +2,12 @@ package payment
 
 import (
 	"sync"
+
+	"github.com/mpedroni/rinha-backend-2025/config"
 )
 
 type Queue struct {
+	// TODO: update to linked list
 	payments []*Payment
 	ch       chan *Payment
 	m        sync.Mutex
@@ -23,28 +26,23 @@ func NewQueue() *Queue {
 
 func (pq *Queue) publish() {
 	for {
+		pq.m.Lock()
 		if pq.idx >= len(pq.payments) {
-			continue
-		}
-
-		if len(pq.payments) > 90 {
-			pq.m.Lock()
-
-			pq.payments = pq.payments[pq.idx:]
-			pq.idx = 0
-
 			pq.m.Unlock()
+			continue
 		}
 
 		p := pq.payments[pq.idx]
 		pq.idx++
 		pq.ch <- p
+		pq.m.Unlock()
 	}
 }
 
 func (pq *Queue) Publish(payment *Payment) {
 	pq.m.Lock()
 	defer pq.m.Unlock()
+	config.Log.Debug("publishing payment to queue", "payment", payment)
 	pq.payments = append(pq.payments, payment)
 }
 

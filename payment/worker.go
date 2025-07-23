@@ -1,6 +1,11 @@
 package payment
 
-import "github.com/mpedroni/rinha-backend-2025/config"
+import (
+	"context"
+	"errors"
+
+	"github.com/mpedroni/rinha-backend-2025/config"
+)
 
 type WorkerPool struct {
 	Num     int
@@ -12,11 +17,14 @@ func (wp *WorkerPool) Run() {
 	for i := 0; i < wp.Num; i++ {
 		go func(workerID int) {
 			for payment := range wp.Queue.Subscribe() {
-				config.Log.Debug("worker processing payment", "workerID", workerID, "request", payment)
+				config.Log.Debug("worker processing payment", "workerID", workerID, "payment", payment)
 
-				err := wp.process(payment)
+				if err := wp.process(payment); err != nil {
+					if errors.Is(err, ErrPaymentAlreadyProcessed) {
+						config.Log.Info("payment already processed, skipping", "workerID", workerID, "correlationId", payment.CorrelationID)
+						continue
+					}
 
-				if err != nil {
 					config.Log.Error("payment processing failed", "workerID", workerID, "correlationId", payment.CorrelationID, "error", err)
 					wp.Queue.Publish(payment)
 					continue
@@ -24,11 +32,14 @@ func (wp *WorkerPool) Run() {
 
 				config.Log.Info("payment processed", "workerID", workerID, "correlationId", payment.CorrelationID)
 			}
-		}(i)
+		}(i + 1)
 	}
 }
 
 func (wp *WorkerPool) process(p *Payment) error {
-	config.Log.Debug("processing payment", "correlationId", p.CorrelationID, "amount", p.Amount)
+	if err := wp.Service.Pay(context.TODO(), p); err != nil {
+		return err
+	}
+
 	return nil
 }
