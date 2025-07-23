@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/mpedroni/rinha-backend-2025/config"
 )
@@ -26,8 +25,6 @@ func (h *Handler) ProcessPaymentHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	req.ReceivedAt = time.Now()
 
 	config.Log.Debug("processing payment", "request", fmt.Sprintf("%+v", req))
 

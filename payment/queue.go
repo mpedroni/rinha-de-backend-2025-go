@@ -5,16 +5,16 @@ import (
 )
 
 type Queue struct {
-	payments []ProcessPaymentRequest
-	ch       chan ProcessPaymentRequest
+	payments []*Payment
+	ch       chan *Payment
 	m        sync.Mutex
 	idx      int
 }
 
 func NewQueue() *Queue {
 	q := &Queue{
-		payments: make([]ProcessPaymentRequest, 0, 100),
-		ch:       make(chan ProcessPaymentRequest),
+		payments: make([]*Payment, 0, 100),
+		ch:       make(chan *Payment),
 	}
 
 	go q.publish()
@@ -36,18 +36,18 @@ func (pq *Queue) publish() {
 			pq.m.Unlock()
 		}
 
-		req := pq.payments[pq.idx]
+		p := pq.payments[pq.idx]
 		pq.idx++
-		pq.ch <- req
+		pq.ch <- p
 	}
 }
 
-func (pq *Queue) Publish(req ProcessPaymentRequest) {
+func (pq *Queue) Publish(payment *Payment) {
 	pq.m.Lock()
 	defer pq.m.Unlock()
-	pq.payments = append(pq.payments, req)
+	pq.payments = append(pq.payments, payment)
 }
 
-func (pq *Queue) Subscribe() <-chan ProcessPaymentRequest {
+func (pq *Queue) Subscribe() <-chan *Payment {
 	return pq.ch
 }

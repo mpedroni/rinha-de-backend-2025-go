@@ -11,24 +11,24 @@ type WorkerPool struct {
 func (wp *WorkerPool) Run() {
 	for i := 0; i < wp.Num; i++ {
 		go func(workerID int) {
-			for req := range wp.Queue.Subscribe() {
-				config.Log.Debug("worker processing payment", "workerID", workerID, "request", req)
+			for payment := range wp.Queue.Subscribe() {
+				config.Log.Debug("worker processing payment", "workerID", workerID, "request", payment)
 
-				err := wp.process(req)
+				err := wp.process(payment)
 
 				if err != nil {
-					config.Log.Error("payment processing failed", "workerID", workerID, "correlationId", req.CorrelationID, "error", err)
-					wp.Queue.Publish(req)
+					config.Log.Error("payment processing failed", "workerID", workerID, "correlationId", payment.CorrelationID, "error", err)
+					wp.Queue.Publish(payment)
 					continue
 				}
 
-				config.Log.Info("payment processed", "workerID", workerID, "correlationId", req.CorrelationID)
+				config.Log.Info("payment processed", "workerID", workerID, "correlationId", payment.CorrelationID)
 			}
 		}(i)
 	}
 }
 
-func (wp *WorkerPool) process(req ProcessPaymentRequest) error {
-	config.Log.Debug("processing payment", "correlationId", req.CorrelationID, "amount", req.Amount)
+func (wp *WorkerPool) process(p *Payment) error {
+	config.Log.Debug("processing payment", "correlationId", p.CorrelationID, "amount", p.Amount)
 	return nil
 }
