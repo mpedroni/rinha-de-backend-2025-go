@@ -11,8 +11,8 @@ import (
 
 type Config struct {
 	Addr                 string
-	Debug                bool
 	ServiceName          string
+	LogLevel             slog.Level
 	WorkersCount         int
 	DBConnectionString   string
 	DefaultProcessorURL  *url.URL
@@ -26,7 +26,7 @@ var Log *slog.Logger
 
 func Load() error {
 	addr := os.Getenv("ADDR")
-	debug := os.Getenv("DEBUG")
+	level := os.Getenv("LOG_LEVEL")
 	service := os.Getenv("SERVICE_NAME")
 	workersCount := os.Getenv("WORKERS_COUNT")
 	dbConnectionString := os.Getenv("DB_CONNECTION_STRING")
@@ -62,9 +62,20 @@ func Load() error {
 		return errors.New("PROCESSOR_FALLBACK_URL environment variable is required")
 	}
 
-	isDebug := debug == "true"
+	var loglvl slog.Level
+	if level != "" {
+		switch level {
+		case "debug":
+			loglvl = slog.LevelDebug
+		case "info":
+			loglvl = slog.LevelInfo
+		default:
+			loglvl = slog.LevelError
+		}
+	}
+
 	out := io.Discard
-	if isDebug {
+	if level != "" && level != "none" {
 		out = os.Stderr
 	}
 
@@ -79,7 +90,7 @@ func Load() error {
 
 	Cfg = &Config{
 		Addr:                 addr,
-		Debug:                isDebug,
+		LogLevel:             loglvl,
 		ServiceName:          service,
 		WorkersCount:         workersCountInt,
 		DBConnectionString:   dbConnectionString,

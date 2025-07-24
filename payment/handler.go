@@ -34,6 +34,8 @@ func (h *Handler) ProcessPaymentHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	config.Log.Info("payment scheduled successfully", "request", fmt.Sprintf("%+v", req))
+
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -67,4 +69,14 @@ func (h *Handler) GetPaymentsSummaryHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (h *Handler) PurgePaymentsHandler(w http.ResponseWriter, r *http.Request) {
+	if err := h.svc.PurgePayments(r.Context()); err != nil {
+		config.Log.Error("failed to purge payments", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

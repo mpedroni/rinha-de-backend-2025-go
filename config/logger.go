@@ -7,10 +7,7 @@ import (
 func setupLogger() {
 	opts := &slog.HandlerOptions{}
 
-	if Cfg.Debug {
-		opts.Level = slog.LevelDebug
-	}
-
+	opts.Level = Cfg.LogLevel
 	Log = slog.
 		New(slog.NewTextHandler(Cfg.Stdout, opts)).
 		With("service", Cfg.ServiceName)

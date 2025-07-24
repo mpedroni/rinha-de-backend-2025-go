@@ -49,7 +49,7 @@ services:
     environment:
       - SERVICE_NAME=api-1
       - PORT=3000
-      - DEBUG=true
+      - LOG_LEVEL=info
       - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
@@ -72,7 +72,7 @@ services:
     environment:
       - SERVICE_NAME=api-2
       - PORT=3000
-      - DEBUG=true
+      - LOG_LEVEL=info
       - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
