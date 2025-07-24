@@ -52,6 +52,7 @@ func main() {
 
 	mux.HandleFunc("POST /payments", h.ProcessPaymentHandler)
 	mux.HandleFunc("GET /payments-summary", h.GetPaymentsSummaryHandler)
+	mux.HandleFunc("POST /purge-payments", h.PurgePaymentsHandler)
 
 	config.Log.Info("starting server", "addr", config.Cfg.Addr)
 	if err := http.ListenAndServe(config.Cfg.Addr, mux); err != nil {

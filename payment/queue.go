@@ -42,10 +42,18 @@ func (pq *Queue) publish() {
 func (pq *Queue) Publish(payment *Payment) {
 	pq.m.Lock()
 	defer pq.m.Unlock()
-	config.Log.Debug("publishing payment to queue", "payment", payment)
+	config.Log.Info("publishing payment to queue", "payment", payment)
 	pq.payments = append(pq.payments, payment)
 }
 
 func (pq *Queue) Subscribe() <-chan *Payment {
 	return pq.ch
+}
+
+func (pq *Queue) Purge() {
+	pq.m.Lock()
+	defer pq.m.Unlock()
+	config.Log.Debug("purging payment queue")
+	pq.payments = make([]*Payment, 0, 100)
+	pq.idx = 0
 }

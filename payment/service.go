@@ -98,6 +98,17 @@ func (s *Service) GetPaymentsSummary(ctx context.Context, req GetPaymentsSummary
 	return summary, nil
 }
 
+func (s *Service) PurgePayments(ctx context.Context) error {
+	s.queue.Purge()
+
+	_, err := s.db.Exec(ctx, "DELETE FROM payments")
+	if err != nil {
+		return fmt.Errorf("failed to purge payments: %w", err)
+	}
+
+	return nil
+}
+
 func (s *Service) Pay(ctx context.Context, p *Payment) error {
 	if err := s.pay(ctx, p); err != nil {
 		return err
