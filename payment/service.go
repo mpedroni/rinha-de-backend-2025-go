@@ -41,7 +41,7 @@ func NewService(q *Queue, db *pgxpool.Pool, cfg Config) *Service {
 }
 
 func (s *Service) SchedulePayment(ctx context.Context, req ProcessPaymentRequest) error {
-	s.queue.Publish(&Payment{
+	s.queue.Enqueue(&Payment{
 		CorrelationID: req.CorrelationID,
 		Amount:        ParseMoney(req.Amount),
 		ReceivedAt:    time.Now(),
@@ -110,8 +110,8 @@ func (s *Service) PurgePayments(ctx context.Context) error {
 }
 
 func (s *Service) Pay(ctx context.Context, p *Payment) error {
-	if err := s.pay(ctx, p); err != nil {
-		return err
+	if err := s.pay(ctx, p); err != nil && !errors.Is(err, ErrPaymentAlreadyProcessed) {
+		return s.Pay(ctx, p) // Retry payment if it fails
 	}
 
 	p.Paid()
