@@ -39,5 +39,5 @@ func (p *Payment) AmountAsFloat() float64 {
 
 func (p *Payment) Paid() {
 	p.Status = Paid
-	p.PaidAt = time.Now()
+	p.PaidAt = time.Now().UTC()
 }

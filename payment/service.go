@@ -44,7 +44,7 @@ func (s *Service) SchedulePayment(ctx context.Context, req ProcessPaymentRequest
 	s.queue.Enqueue(&Payment{
 		CorrelationID: req.CorrelationID,
 		Amount:        ParseMoney(req.Amount),
-		ReceivedAt:    time.Now(),
+		ReceivedAt:    time.Now().UTC().Truncate(time.Second),
 		Status:        Pending,
 		Processor:     Default,
 	})
@@ -159,7 +159,7 @@ func (s *Service) pay(ctx context.Context, p *Payment) error {
 
 func (s *Service) persist(ctx context.Context, p *Payment) error {
 	_, err := s.db.Exec(ctx, "INSERT INTO payments (correlation_id, amount, received_at, status, processor, paid_at) VALUES ($1, $2, $3, $4, $5, $6)",
-		p.CorrelationID, p.Amount, p.ReceivedAt.UTC(), p.Status, p.Processor, p.PaidAt.UTC())
+		p.CorrelationID, p.Amount, p.ReceivedAt, p.Status, p.Processor, p.PaidAt)
 	if err != nil {
 		return fmt.Errorf("failed to persist payment: %w", err)
 	}

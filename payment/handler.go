@@ -69,6 +69,8 @@ func (h *Handler) GetPaymentsSummaryHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	config.Log.Info("payments summary retrieved successfully", "req", req, "summary", fmt.Sprintf("%+v", summary))
 }
 
 func (h *Handler) PurgePaymentsHandler(w http.ResponseWriter, r *http.Request) {

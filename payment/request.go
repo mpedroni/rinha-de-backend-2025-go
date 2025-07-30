@@ -34,6 +34,6 @@ func NewPayRequest(p *Payment) PayRequestBody {
 	return PayRequestBody{
 		CorrelationID: p.CorrelationID,
 		Amount:        p.AmountAsFloat(),
-		RequestedAt:   p.ReceivedAt.UTC().Format(time.RFC3339),
+		RequestedAt:   p.ReceivedAt.Format(time.RFC3339),
 	}
 }
