@@ -44,7 +44,7 @@ services:
           memory: "120MB"
 
   api1: &api
-    image: mpedroni/rinha-backend-2025:latest
+    image: ghcr.io/mpedroni/rinha-de-backend-2025:latest
     hostname: api1
     environment:
       - SERVICE_NAME=api-1
