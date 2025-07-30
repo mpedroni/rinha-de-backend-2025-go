@@ -34,7 +34,7 @@ func ParseMoney(amount float64) int {
 }
 
 func (p *Payment) AmountAsFloat() float64 {
-	return float64(p.Amount / 100.0)
+	return float64(float64(p.Amount) / 100.0)
 }
 
 func (p *Payment) Paid() {
