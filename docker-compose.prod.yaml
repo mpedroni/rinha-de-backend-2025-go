@@ -43,12 +43,12 @@ services:
           memory: "120MB"
 
   api1: &api
-    build: .
+    image: ghcr.io/mpedroni/rinha-de-backend-2025:v1.0.0
     hostname: api1
     environment:
       - SERVICE_NAME=api-1
       - PORT=3000
-      - LOG_LEVEL=info
+      - LOG_LEVEL=none
       - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
@@ -56,8 +56,6 @@ services:
     networks:
       - api-network
       - payment-processor
-    ports:
-      - 60601:6060
     depends_on:
       db:
         condition: service_healthy
@@ -70,12 +68,10 @@ services:
   api2:
     <<: *api
     hostname: api2
-    ports:
-      - 60602:6060
     environment:
       - SERVICE_NAME=api-2
       - PORT=3000
-      - LOG_LEVEL=info
+      - LOG_LEVEL=none
       - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
