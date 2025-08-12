@@ -22,7 +22,7 @@ func main() {
 	}
 
 	dbconfig.MaxConns = 10
-	dbconfig.MinIdleConns = 5
+	dbconfig.MinIdleConns = 10
 
 	db, err := pgxpool.NewWithConfig(context.Background(), dbconfig)
 	if err != nil {
