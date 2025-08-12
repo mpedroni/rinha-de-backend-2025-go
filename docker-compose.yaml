@@ -28,6 +28,8 @@ services:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - type: tmpfs
+        target: /var/lib/postgresql/data
     networks:
       - api-network
     healthcheck:
