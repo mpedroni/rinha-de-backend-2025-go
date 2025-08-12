@@ -52,16 +52,24 @@ func (s *Service) SchedulePayment(ctx context.Context, req ProcessPaymentRequest
 }
 
 func (s *Service) GetPaymentsSummary(ctx context.Context, req GetPaymentsSummaryRequest) (PaymentsSummaryResponse, error) {
+	var from, to *string
+	if req.From != "" {
+		from = &req.From
+	}
+	if req.To != "" {
+		to = &req.To
+	}
+
 	var summary PaymentsSummaryResponse
 	rows, err := s.db.Query(ctx, `
 		SELECT
 			processor, ROUND(SUM(amount::decimal / 100), 2), COUNT(*)
 		FROM payments
 		WHERE
-			received_at BETWEEN $1 AND $2
+			received_at BETWEEN COALESCE($1, to_timestamp(0)) AND COALESCE($2, now())
 			AND status = 1
 		GROUP BY processor;
-	`, req.From, req.To)
+	`, from, to)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
