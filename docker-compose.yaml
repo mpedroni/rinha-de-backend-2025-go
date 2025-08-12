@@ -15,7 +15,7 @@ services:
       resources:
         limits:
           cpus: "0.2"
-          memory: "38MB"
+          memory: "46MB"
 
   db:
     image: postgres:17-alpine
@@ -42,7 +42,7 @@ services:
       resources:
         limits:
           cpus: "0.3"
-          memory: "120MB"
+          memory: "184MB"
 
   api1: &api
     build: .
@@ -50,7 +50,7 @@ services:
     environment:
       - SERVICE_NAME=api-1
       - PORT=3000
-      - LOG_LEVEL=info
+      - LOG_LEVEL=none
       - DB_CONNECTION_STRING=postgres://postgres:postgres@rinha-db:5432/rinha?sslmode=disable
       - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
       - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
@@ -67,7 +67,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: "96MB"
+          memory: "60MB"
 
   api2:
     <<: *api
