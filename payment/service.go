@@ -45,7 +45,6 @@ func (s *Service) SchedulePayment(ctx context.Context, req ProcessPaymentRequest
 		CorrelationID: req.CorrelationID,
 		Amount:        ParseMoney(req.Amount),
 		ReceivedAt:    time.Now().UTC().Truncate(time.Second),
-		Status:        Pending,
 		Processor:     Default,
 	})
 	return nil
@@ -67,7 +66,6 @@ func (s *Service) GetPaymentsSummary(ctx context.Context, req GetPaymentsSummary
 		FROM payments
 		WHERE
 			received_at BETWEEN COALESCE($1, to_timestamp(0)) AND COALESCE($2, now())
-			AND status = 1
 		GROUP BY processor;
 	`, from, to)
 
@@ -166,8 +164,8 @@ func (s *Service) pay(ctx context.Context, p *Payment) error {
 }
 
 func (s *Service) persist(ctx context.Context, p *Payment) error {
-	_, err := s.db.Exec(ctx, "INSERT INTO payments (correlation_id, amount, received_at, status, processor, paid_at) VALUES ($1, $2, $3, $4, $5, $6)",
-		p.CorrelationID, p.Amount, p.ReceivedAt, p.Status, p.Processor, p.PaidAt)
+	_, err := s.db.Exec(ctx, "INSERT INTO payments (correlation_id, amount, received_at, processor, paid_at) VALUES ($1, $2, $3, $4, $5)",
+		p.CorrelationID, p.Amount, p.ReceivedAt, p.Processor, p.PaidAt)
 	if err != nil {
 		return fmt.Errorf("failed to persist payment: %w", err)
 	}

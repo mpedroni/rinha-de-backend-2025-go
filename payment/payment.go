@@ -23,7 +23,6 @@ const (
 type Payment struct {
 	CorrelationID string
 	Amount        int
-	Status        PaymentStatus
 	Processor     PaymentProcessor
 	ReceivedAt    time.Time
 	PaidAt        time.Time
@@ -38,6 +37,5 @@ func (p *Payment) AmountAsFloat() float64 {
 }
 
 func (p *Payment) Paid() {
-	p.Status = Paid
 	p.PaidAt = time.Now().UTC()
 }
