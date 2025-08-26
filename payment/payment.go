@@ -5,14 +5,6 @@ import (
 	"time"
 )
 
-type PaymentStatus int
-
-const (
-	Pending PaymentStatus = iota
-	Paid
-	Failed
-)
-
 type PaymentProcessor int
 
 const (
